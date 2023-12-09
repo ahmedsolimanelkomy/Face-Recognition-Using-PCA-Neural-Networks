@@ -1,0 +1,31 @@
+function [ Data ,labels ,numImages,target_matrix] = Read_Data(dirPath)
+
+        % Set the directory path where the images are stored
+        % Get the list of image files in the directory
+        imageFiles = dir(fullfile(dirPath, '*.jpg'));
+        numImages = numel(imageFiles);
+        labels = zeros(numImages,1);
+        % Read the images into a 3D matrix
+        Data = zeros(64, 64, length(imageFiles));
+        for i = 1:length(imageFiles)
+            image = fullfile(dirPath, imageFiles(i).name);
+            a =imread(image);
+            image = im2gray(a);
+            Data(:, :, i) = double(imresize(image,[64 64]));
+%             labels(i) = imageFiles(i).name(1:9); % Extract label from filename
+            label = strtok(imageFiles(i).name, '_'); % extract the label from the filename
+            labels(i) = str2double(label); % store the label in the cell array
+        end
+        labels = labels';
+        % Reshape the 3D matrix into a 2D matrix
+        Data = reshape(Data,64*64, length(imageFiles));
+
+        %normalizaion of images 
+        Data = double(Data')/255;
+        
+        % labels = categorical(labels);
+        num_classes = 15; % The number of classes
+        target_matrix = dummyvar(categorical(labels));
+        
+end
+    
